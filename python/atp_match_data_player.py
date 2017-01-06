@@ -80,9 +80,11 @@ def get_atp_match_data_player(year_url):
 
     tourney_conditions_xpath = "//div[contains(., 'Outdoor') or contains(., 'Indoor')]/text()[normalize-space()]"
     tourney_conditions_parsed = html_parse(year_url_page, tourney_conditions_xpath)
+    tourney_conditions_cleaned = regex_strip_array(tourney_draw_parsed)
 
     tourney_surface_xpath = "//div[contains(., 'Outdoor') or contains(., 'Indoor')]/span/text()[normalize-space()]"
     tourney_surface_parsed = html_parse(year_url_page, tourney_surface_xpath)
+    tourney_surface_cleaned = regex_strip_array(tourney_surface_parsed)
 
     tourney_prize_money_xpath = "//td[contains(@class, 'prize-money')]/div/div/span/text()"
     tourney_prize_money_parsed = html_parse(year_url_page, tourney_prize_money_xpath)
@@ -125,8 +127,8 @@ def get_atp_match_data_player(year_url):
         tourney_singles_draw = tourney_draw_cleaned[2*i]
         tourney_doubles_draw = tourney_draw_cleaned[2*i + 1]
 
-        tourney_conditions = tourney_conditions_parsed[i].strip()
-        tourney_surface = tourney_surface_parsed[i].strip()
+        tourney_conditions = tourney_conditions_cleaned[i]
+        tourney_surface = tourney_surface_cleaned[i]
 
         # Unicode problem
         # tourney_prize_money = tourney_prize_money_cleaned[i]
