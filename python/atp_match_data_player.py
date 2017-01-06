@@ -28,10 +28,7 @@ def html_parse(url, xpath):
     return result
 
 def regex_strip_string(string):
-    string = re.sub('\n', '', string)
-    string = re.sub('\r', '', string)
-    string = re.sub('\t', '', string)
-    return string
+    return re.sub(r'\n|\r|\t', '', string)
 
 def regex_strip_array(array):
     for i in xrange(0, len(array)):
