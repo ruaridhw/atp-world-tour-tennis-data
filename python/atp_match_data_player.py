@@ -628,11 +628,10 @@ def get_atp_match_data_player(year_url):
                 csv_array.append(data)
 
                 # Output to CSV file
-                csv_out = open(player_slug + "_" + tourney_year + ".csv", 'wb')
-                mywriter = csv.writer(csv_out)
-                for row in csv_array:
-                    mywriter.writerow(row)
-                csv_out.close()
+                with open(player_slug + "_" + tourney_year + ".csv", 'wb') as csv_out:
+                    mywriter = csv.writer(csv_out)
+                    for row in csv_array:
+                        mywriter.writerow(row)
 
 if __name__ == '__main__':
     # Command line input
