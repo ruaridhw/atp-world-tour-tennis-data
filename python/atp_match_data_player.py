@@ -131,9 +131,9 @@ def get_atp_match_data_player(year_url):
         tourney_surface = tourney_surface_cleaned[i]
 
         # Unicode problem
-        # tourney_prize_money = tourney_prize_money_cleaned[i]
+        tourney_prize_money = tourney_prize_money_cleaned[i].replace(u'\u20ac','EUR').replace(u'\xa3','GBP')
         # tourney_fin_commit = tourney_fin_commit_cleaned[i]
-        tourney_prize_money = ""
+        # tourney_prize_money = ""
         tourney_fin_commit = ""
 
         player_tourney_activity_split = player_tourney_activity_parsed[i].split(", ")
@@ -141,8 +141,8 @@ def get_atp_match_data_player(year_url):
         player_ranking = player_tourney_activity_split[1].split(": ")[1]
 
         # Unicode problem
-        # player_prize_money = player_tourney_activity_split[2].split(": ")[1]
-        player_prize_money = ""
+        player_prize_money = player_tourney_activity_split[2].split(": ")[1].replace(u'\u20ac','EUR').replace(u'\xa3','GBP')
+        # player_prize_money = ""
 
         mega_table_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr"
         mega_table_parsed = html_parse(year_url_page, mega_table_xpath)
