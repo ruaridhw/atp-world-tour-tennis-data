@@ -39,7 +39,6 @@ def get_atp_match_data_player(year_url):
     year_url_split = year_url.split("/")
     player_slug = year_url_split[4]
     player_id = year_url_split[5]
-    tourney_year = year_url_split[6].replace("player-activity?year=","")
 
     player_slug_split = player_slug.split("-")
     new_name_array = []
@@ -72,6 +71,8 @@ def get_atp_match_data_player(year_url):
     tourney_dates_xpath = "//span[contains(@class, 'tourney-dates')]/text()"
     tourney_dates_parsed = html_parse(year_url_page, tourney_dates_xpath)
     tourney_dates_cleaned = regex_strip_array(tourney_dates_parsed)
+
+    tourney_years_cleaned = [i[0:3] for i in tourney_dates_cleaned] # use first four digits of start date
 
     tourney_draw_xpath = "//a[contains(@class, 'not-in-system')]/span/text()"
     tourney_draw_parsed = html_parse(year_url_page, tourney_draw_xpath)
@@ -119,6 +120,7 @@ def get_atp_match_data_player(year_url):
             tourney_name = tourney_name_parsed[0]
 
         tourney_location = tourney_location_cleaned[i]
+        tourney_year = tourney_years_cleaned[i]
         tourney_dates = tourney_dates_cleaned[i]
         tourney_singles_draw = tourney_draw_cleaned[2*i]
         tourney_doubles_draw = tourney_draw_cleaned[2*i + 1]
