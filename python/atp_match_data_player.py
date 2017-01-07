@@ -72,7 +72,7 @@ def get_atp_match_data_player(year_url):
     tourney_dates_parsed = html_parse(year_url_page, tourney_dates_xpath)
     tourney_dates_cleaned = regex_strip_array(tourney_dates_parsed)
 
-    tourney_years_cleaned = [i[0:3] for i in tourney_dates_cleaned] # use first four digits of start date
+    tourney_years_cleaned = [i[:4] for i in tourney_dates_cleaned] # use first four digits of start date
 
     tourney_draw_xpath = "//a[contains(@class, 'not-in-system')]/span/text()"
     tourney_draw_parsed = html_parse(year_url_page, tourney_draw_xpath)
