@@ -21,9 +21,9 @@ import json
 import csv
 import sys
 
-def html_parse(page, xpath):
-    tree = html.fromstring(page.content)
-    return tree.xpath(xpath)
+def html_parse(url):
+    page = requests.get(url)
+    return html.fromstring(page.content)
 
 def regex_strip_string(string):
     return re.sub(r'\n|\r|\t', '', string)
@@ -35,7 +35,7 @@ def regex_strip_array(array):
 
 def get_atp_match_data_player(year_url):
     # Parsing the command line input
-    year_url_page = requests.get(year_url)
+    top_url_tree = html_parse(year_url)
     year_url_split = year_url.split("/")
     player_slug = year_url_split[4]
     player_id = year_url_split[5]
@@ -61,54 +61,54 @@ def get_atp_match_data_player(year_url):
 
     # XPaths
     tourney_count_xpath = "//div[contains(@class, 'activity-tournament-table')]"
-    tourney_count_parsed = html_parse(year_url_page, tourney_count_xpath)
+    tourney_count_parsed = top_url_tree.xpath(tourney_count_xpath)
     tourney_count = len(tourney_count_parsed)
 
     tourney_location_xpath = "//span[contains(@class, 'tourney-location')]/text()"
-    tourney_location_parsed = html_parse(year_url_page, tourney_location_xpath)
+    tourney_location_parsed = top_url_tree.xpath(tourney_location_xpath)
     tourney_location_cleaned = regex_strip_array(tourney_location_parsed)
 
     tourney_dates_xpath = "//span[contains(@class, 'tourney-dates')]/text()"
-    tourney_dates_parsed = html_parse(year_url_page, tourney_dates_xpath)
+    tourney_dates_parsed = top_url_tree.xpath(tourney_dates_xpath)
     tourney_dates_cleaned = regex_strip_array(tourney_dates_parsed)
 
     tourney_years_cleaned = [i[:4] for i in tourney_dates_cleaned] # use first four digits of start date
 
     tourney_draw_xpath = "//a[contains(@class, 'not-in-system')]/span/text()"
-    tourney_draw_parsed = html_parse(year_url_page, tourney_draw_xpath)
+    tourney_draw_parsed = top_url_tree.xpath(tourney_draw_xpath)
     tourney_draw_cleaned = regex_strip_array(tourney_draw_parsed)
 
     tourney_conditions_xpath = "//div[contains(., 'Outdoor') or contains(., 'Indoor')]/text()[normalize-space()]"
-    tourney_conditions_parsed = html_parse(year_url_page, tourney_conditions_xpath)
+    tourney_conditions_parsed = top_url_tree.xpath(tourney_conditions_xpath)
     tourney_conditions_cleaned = regex_strip_array(tourney_draw_parsed)
 
     tourney_surface_xpath = "//div[contains(., 'Outdoor') or contains(., 'Indoor')]/span/text()[normalize-space()]"
-    tourney_surface_parsed = html_parse(year_url_page, tourney_surface_xpath)
+    tourney_surface_parsed = top_url_tree.xpath(tourney_surface_xpath)
     tourney_surface_cleaned = regex_strip_array(tourney_surface_parsed)
 
     tourney_prize_money_xpath = "//td[contains(@class, 'prize-money')]/div/div/span/text()"
-    tourney_prize_money_parsed = html_parse(year_url_page, tourney_prize_money_xpath)
+    tourney_prize_money_parsed = top_url_tree.xpath(tourney_prize_money_xpath)
     tourney_prize_money_cleaned = regex_strip_array(tourney_prize_money_parsed)
 
     tourney_fin_commit_xpath = "//td[contains(@class, 'fin-commit')]/div/div/span/text()"
-    tourney_fin_commit_parsed = html_parse(year_url_page, tourney_fin_commit_xpath)
+    tourney_fin_commit_parsed = top_url_tree.xpath(tourney_fin_commit_xpath)
     tourney_fin_commit_cleaned = regex_strip_array(tourney_fin_commit_parsed)
 
     player_tourney_activity_xpath = "//div[contains(@class, 'activity-tournament-caption')]/text()"
-    player_tourney_activity_parsed = html_parse(year_url_page, player_tourney_activity_xpath)
+    player_tourney_activity_parsed = top_url_tree.xpath(player_tourney_activity_xpath)
 
     # Iterate over each tournament
     for i in xrange(0, tourney_count):
 
         tourney_href_xpath = "//div[contains(@class, 'activity-tournament-table')][" + str(i+1) + "]/table[1]/tbody/tr/td[2]/a/@href"
-        tourney_href_parsed = html_parse(year_url_page, tourney_href_xpath)
+        tourney_href_parsed = top_url_tree.xpath(tourney_href_xpath)
 
         # Condition for Davis Cup tournaments, which lack info that the other tournaments have
         if len(tourney_href_parsed) == 0:
             tourney_name_slug = ""
             tourney_id = ""
             tourney_name_xpath = "//div[contains(@class, 'activity-tournament-table')][" + str(i+1) + "]/table[1]/tbody/tr/td[2]/span[contains(@class, 'tourney-title')]/text()"
-            tourney_name_parsed = html_parse(year_url_page, tourney_name_xpath)
+            tourney_name_parsed = top_url_tree.xpath(tourney_name_xpath)
             tourney_name_cleaned = regex_strip_array(tourney_name_parsed)
             tourney_name = tourney_name_cleaned[0]
         # Condition for non-Davis Cup tournaments
@@ -118,7 +118,7 @@ def get_atp_match_data_player(year_url):
             tourney_name_slug = tourney_href_split[3]
             tourney_id = tourney_href_split[4]
             tourney_name_xpath = "//div[contains(@class, 'activity-tournament-table')][" + str(i+1) + "]/table[1]/tbody/tr/td[2]/a/text()"
-            tourney_name_parsed = html_parse(year_url_page, tourney_name_xpath)
+            tourney_name_parsed = top_url_tree.xpath(tourney_name_xpath)
             tourney_name = tourney_name_parsed[0]
 
         tourney_location = tourney_location_cleaned[i]
@@ -145,7 +145,7 @@ def get_atp_match_data_player(year_url):
         # player_prize_money = ""
 
         mega_table_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr"
-        mega_table_parsed = html_parse(year_url_page, mega_table_xpath)
+        mega_table_parsed = top_url_tree.xpath(mega_table_xpath)
         tourney_match_count = len(mega_table_parsed)
 
         # Iterate over each match
@@ -153,31 +153,31 @@ def get_atp_match_data_player(year_url):
 
             # Mega table XPaths
             match_round_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[1]/text()"
-            match_round_parsed = html_parse(year_url_page, match_round_xpath)
+            match_round_parsed = top_url_tree.xpath(match_round_xpath)
 
             opponent_name_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[3]/div[2]/a/text()"
-            opponent_name_parsed = html_parse(year_url_page, opponent_name_xpath)
+            opponent_name_parsed = top_url_tree.xpath(opponent_name_xpath)
 
             opponent_player_url_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[3]/div[2]/a/@href"
-            opponent_player_url_parsed = html_parse(year_url_page, opponent_player_url_xpath)
+            opponent_player_url_parsed = top_url_tree.xpath(opponent_player_url_xpath)
 
             opponent_rank_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[2]/text()"
-            opponent_rank_parsed = html_parse(year_url_page, opponent_rank_xpath)
+            opponent_rank_parsed = top_url_tree.xpath(opponent_rank_xpath)
 
             match_won_loss_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[4]/text()"
-            match_won_loss_parsed = html_parse(year_url_page, match_won_loss_xpath)
+            match_won_loss_parsed = top_url_tree.xpath(match_won_loss_xpath)
 
             match_score_node_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[5]/a/node()"
-            match_score_node_parsed = html_parse(year_url_page, match_score_node_xpath)
+            match_score_node_parsed = top_url_tree.xpath(match_score_node_xpath)
 
             match_score_text_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[5]/a/text()"
-            match_score_text_parsed = html_parse(year_url_page, match_score_text_xpath)
+            match_score_text_parsed = top_url_tree.xpath(match_score_text_xpath)
 
             match_score_tiebreak_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[5]/a/sup/text()"
-            match_score_tiebreak_parsed = html_parse(year_url_page, match_score_tiebreak_xpath)
+            match_score_tiebreak_parsed = top_url_tree.xpath(match_score_tiebreak_xpath)
 
             match_stats_url_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr[" + str(j+1) + "]/td[5]/a/@href"
-            match_stats_url_parsed = html_parse(year_url_page, match_stats_url_xpath)
+            match_stats_url_parsed = top_url_tree.xpath(match_stats_url_xpath)
 
             # Condition to skip "Bye" matches
             if len(opponent_name_parsed) > 0:
@@ -362,10 +362,10 @@ def get_atp_match_data_player(year_url):
                 # Condition if the match stats URL is available
                 elif len(match_stats_url_parsed[0]) > 0:
                     match_stats_url = url_prefix + match_stats_url_parsed[0]
-                    match_stats_page = requests.get(match_stats_url)
+                    match_stats_tree = html_parse(match_stats_url)
 
                     match_time_xpath = "//td[contains(@class, 'time')]/text()"
-                    match_time_parsed = html_parse(match_stats_page, match_time_xpath)
+                    match_time_parsed = match_stats_tree.xpath(match_time_xpath)
                     match_time_cleaned = regex_strip_array(match_time_parsed)
 
                     # match_time = match_time_cleaned[0].split(": ")[1]
@@ -376,7 +376,7 @@ def get_atp_match_data_player(year_url):
                     match_duration = 60*match_time_hours + match_time_minutes
 
                     match_stats_xpath = "//*[@id='matchStatsData']/text()"
-                    match_stats_parsed = html_parse(match_stats_page, match_stats_xpath)
+                    match_stats_parsed = match_stats_tree.xpath(match_stats_xpath)
 
                     match_stats_cleaned = regex_strip_string(match_stats_parsed[0])
                     json_string = match_stats_cleaned
