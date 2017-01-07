@@ -87,7 +87,7 @@ On my end, it takes ~3.22 seconds to scrape the data for each match, so for some
 <div id="part-a3"></div>
 
 ### A3. CSV headers [^](#contents)
-The following are the 99 column headers. Note that I didn't include the "tournament prize money" and "player prize money" data because of problems with outputting unicode to CSV format in my version of Python 2.7.5. I think the more recent versions of Python have rectified this problem, however updating my version of Python is non-trivial, and I don't have the time to do it right now. In any case, the unicode problem is due to the pound sterling `£` and euro `€`characters.
+The following are the 101 column headers. Note "tournament prize money" and "player prize money" are now included by replacing the pound sterling `£` and euro `€`characters with `GBP` and `EUR` respectively.
 ```
 tourney_year
 tourney_name
@@ -99,11 +99,13 @@ tourney_singles_draw
 tourney_doubles_draw
 tourney_conditions
 tourney_surface
+tourney_prize_money
 player_name
 player_slug
 player_id
 player_event_points
 player_ranking
+player_prize_money
 match_round
 opponent_name
 opponent_name_slug
