@@ -90,6 +90,9 @@ def get_atp_match_data_player(year_url):
     tourney_prize_money_parsed = top_url_tree.xpath(tourney_prize_money_xpath)
     tourney_prize_money_cleaned = regex_strip_array(tourney_prize_money_parsed)
 
+    # If a tourney is missing prize money then len(tourney_prize_money_cleaned) < len(tourney_fin_commit_cleaned)
+    tourney_correction = 0
+
     tourney_fin_commit_xpath = "//td[contains(@class, 'fin-commit')]/div/div/span/text()"
     tourney_fin_commit_parsed = top_url_tree.xpath(tourney_fin_commit_xpath)
     tourney_fin_commit_cleaned = regex_strip_array(tourney_fin_commit_parsed)
@@ -130,11 +133,14 @@ def get_atp_match_data_player(year_url):
         tourney_conditions = tourney_conditions_cleaned[i]
         tourney_surface = tourney_surface_cleaned[i]
 
-        # Unicode problem
-        tourney_prize_money = tourney_prize_money_cleaned[i].replace(u'\u20ac','EUR').replace(u'\u00a3','GBP')
-        # tourney_fin_commit = tourney_fin_commit_cleaned[i]
-        # tourney_prize_money = ""
-        tourney_fin_commit = ""
+        # Financial committment is missing then prize money is zero
+        if tourney_fin_commit_cleaned[i] != "":
+            tourney_prize_money = tourney_prize_money_cleaned[i-tourney_correction].replace(u'\u20ac','EUR').replace(u'\u00a3','GBP') # Adjust index by the number of tourneys that are missing prize money
+            tourney_fin_commit = tourney_fin_commit_cleaned[i].replace(u'\u20ac','EUR').replace(u'\u00a3','GBP')
+        else:
+            tourney_prize_money = "0"
+            tourney_fin_commit = "0"
+            tourney_correction += 1
 
         player_tourney_activity_split = player_tourney_activity_parsed[i].split(", ")
         player_event_points = player_tourney_activity_split[0].split(": ")[1]
@@ -142,7 +148,6 @@ def get_atp_match_data_player(year_url):
 
         # Unicode problem
         player_prize_money = player_tourney_activity_split[2].split(": ")[1].replace(u'\u20ac','EUR').replace(u'\u00a3','GBP')
-        # player_prize_money = ""
 
         mega_table_xpath = "//table[contains(@class, 'mega-table')][" + str(i+1) + "]/tbody/tr"
         mega_table_parsed = top_url_tree.xpath(mega_table_xpath)
