@@ -638,11 +638,11 @@ def get_atp_match_data_player(year_url):
                 data_cleaned = [unicodedata.normalize('NFKD', data_cell).encode('ASCII', 'ignore') if isinstance(data_cell, unicode) else data_cell for data_cell in data]
                 csv_array.append(data_cleaned)
 
-                # Output to CSV file
-                with open(player_slug + "_" + tourney_year + ".csv", 'wb') as csv_out:
-                    mywriter = csv.writer(csv_out)
-                    for row in csv_array:
-                        mywriter.writerow(row)
+    # Output to CSV file
+    with open(player_slug + "_" + tourney_year + ".csv", 'wb') as csv_out:
+        mywriter = csv.writer(csv_out)
+        for row in csv_array:
+            mywriter.writerow(row)
 
 if __name__ == '__main__':
     # Command line input
