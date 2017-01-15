@@ -374,12 +374,16 @@ def get_atp_match_data_player(year_url):
                     match_time_parsed = match_stats_tree.xpath(match_time_xpath)
                     match_time_cleaned = regex_strip_array(match_time_parsed)
 
-                    # match_time = match_time_cleaned[0].split(": ")[1]
-                    match_time = match_time_cleaned[0].replace("Time: ", "")
-                    match_time_split = match_time.split(":")
-                    match_time_hours = int(match_time_split[0])
-                    match_time_minutes = int(match_time_split[1])
-                    match_duration = 60*match_time_hours + match_time_minutes
+                    if len(match_time_cleaned) > 0:
+                        # match time missing from match stats
+                        match_time = match_time_cleaned[0].replace("Time: ", "")
+                        match_time_split = match_time.split(":")
+                        match_time_hours = int(match_time_split[0])
+                        match_time_minutes = int(match_time_split[1])
+                        match_duration = 60*match_time_hours + match_time_minutes
+                    else:
+                        match_time = ""
+                        match_duration = ""
 
                     match_stats_xpath = "//*[@id='matchStatsData']/text()"
                     match_stats_parsed = match_stats_tree.xpath(match_stats_xpath)
