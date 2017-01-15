@@ -202,7 +202,7 @@ def get_atp_match_data_player(year_url):
                     match_score = match_score_node_parsed[0].strip()
 
                     # Count games won/lost
-                    match_score_split = match_score.split(" ")
+                    match_score_split = match_score.replace("-","").split(" ")
                     games_won = 0
                     games_lost = 0
                     for k in xrange(0, len(match_score_split)):
