@@ -37,7 +37,7 @@ def regex_strip_array(array):
 def get_atp_match_data_player(year_url):
     # Parsing the command line input
     top_url_tree = html_parse(year_url)
-    year_url_split = year_url.split("/")
+    year_url_split = year_url.replace("/en/","/").split("/")
     player_slug = year_url_split[4]
     player_id = year_url_split[5]
 
